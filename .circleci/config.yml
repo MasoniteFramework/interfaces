@@ -14,17 +14,17 @@ jobs:
             - image: 'circleci/python:3.6'
         steps:
             - pytest
-    Python 3.4:
+    Python3.4:
         docker:
             - image: 'circleci/python:3.4'
         steps:
             - pytest
-    Python 3.5:
+    Python3.5:
         docker:
             - image: 'circleci/python:3.5'
         steps:
             - pytest
-    Python 3.7:
+    Python3.7:
         docker:
             - image: 'circleci/python:3.7'
         steps:
@@ -36,3 +36,6 @@ workflows:
     builds_and_test:
         jobs:
             - build
+            - Python3.4
+            - Python3.5
+            - Python3.7
