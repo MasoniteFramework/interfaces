@@ -29,7 +29,9 @@ jobs:
             - image: 'circleci/python:3.7'
         steps:
             - pytest
-            
+
+orbs:
+  - masonite: masonite/trigger@dev:latest            
 
 workflows:
     version: 2
@@ -39,3 +41,7 @@ workflows:
             - Python34
             - Python35
             - Python37
+            - masonite/deploy:
+                requires:
+                    - build
+                username: josephmancuso
