@@ -42,6 +42,9 @@ workflows:
             - Python35
             - Python37
             - masonite/deploy:
+                username: josephmancuso
+                filters:
+                    tags:
+                        only: /^v.*/
                 requires:
                     - build
-                username: josephmancuso
