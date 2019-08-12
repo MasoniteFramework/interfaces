@@ -10,4 +10,5 @@ jobs:
 workflows:
     version: 2
     builds_and_test:
-        - build
+        jobs:
+            - build
