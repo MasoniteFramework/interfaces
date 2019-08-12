@@ -27,9 +27,9 @@ class Interface:
 
         # Perform Checks
         for method, values in methods_to_check.items():
-
             # Check the existance
-            if method not in methods_to_check_against:
+            if method not in cls.__dict__:
+
                 raise InterfaceException(
                     "{}'s {} method must exist".format(cls, method))
 
