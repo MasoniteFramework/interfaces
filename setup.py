@@ -6,7 +6,7 @@ setup(
         'masonite.interfaces',
     ],
     package_dir={'': 'src'},
-    version='0.0.1',
+    version='0.0.2',
     install_requires=[],
     description="Interface Package",
     author="Joseph Mancuso",
