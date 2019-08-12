@@ -1,13 +1,20 @@
 version: 2
-jobs:
-    build:
-        docker:
-            - image: 'circleci/python:3.6'
+
+commands:
+    pytest:
         steps:
             - checkout
             - run: pip install . --user
             - run: pip install pytest --user
             - run: python -m pytest
+
+jobs:
+    build:
+        docker:
+            - image: 'circleci/python:3.6'
+        steps:
+            - pytest
+            
 
 workflows:
     version: 2
