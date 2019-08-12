@@ -5,6 +5,8 @@ jobs:
             - image: 'circleci/python:3.6'
         steps:
             - checkout
+            - pip install .
+            - pip install pytest
             - python -m pytest
 
 workflows:
