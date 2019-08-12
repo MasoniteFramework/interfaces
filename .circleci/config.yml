@@ -45,7 +45,7 @@ workflows:
                 username: josephmancuso
                 filters:
                     tags:
-                        only: /^v.*/
+                        only: /.*/
                     branches:
                         ignore: /.*/
                 requires:
