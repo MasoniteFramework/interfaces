@@ -4,6 +4,8 @@ This package is to add functionality similiar to how other languages implement i
 
 This will allow you to create an interface class and then all child classes of the interface MUST have the same methods and number of parameters as the interface. 
 
+NOTE: This package can be used outside of Masonite. 
+
 
 # Installation
 
