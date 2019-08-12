@@ -41,9 +41,18 @@ workflows:
                 filters:
                     tags:
                         only: /.*/
-            - Python34
-            - Python35
-            - Python37
+            - Python34:
+                filters:
+                    tags:
+                        only: /.*/
+            - Python35:
+                filters:
+                    tags:
+                        only: /.*/
+            - Python37:
+                filters:
+                    tags:
+                        only: /.*/
             - masonite/deploy:
                 username: josephmancuso
                 filters:
@@ -53,3 +62,6 @@ workflows:
                         ignore: /.*/
                 requires:
                     - build
+                    - Python34
+                    - Python35
+                    - Python37
