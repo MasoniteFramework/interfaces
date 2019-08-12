@@ -38,6 +38,9 @@ workflows:
     builds_and_test:
         jobs:
             - build
+                filters:
+                    tags:
+                        only: /.*/
             - Python34
             - Python35
             - Python37
