@@ -3,7 +3,7 @@ from .exceptions import InterfaceException
 
 class Interface:
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         methods_to_check = {}
         methods_to_check_against = {}
 
@@ -52,8 +52,12 @@ class Interface:
                             cls, parameter_to_check_against[0], method, parameters[1].annotation, parameter_to_check_against[1].annotation))
 
                 variable_search_position += 1
-
+        instance = super().__new__(cls, *args, **kwargs)
+        return instance
     def get_parameters(obj):
-        return inspect.signature(obj).parameters.items()
+        try:
+            return inspect.signature(obj).parameters.items()
+        except TypeError:
+            return ()
 
 

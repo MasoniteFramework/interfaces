@@ -17,8 +17,13 @@ class ConcreteAnnotationInterface(Interface):
 
 class ConcreteClassWithCorrectMethods(ConcreteInterface):
 
+    test_attribute = 'Joe'
+
     def auth(self, var1, var2):
         pass
+
+    def username(self):
+        return 'Joe'
 
 
 class ConcreteClassWithInCorrectSignature(ConcreteInterface):
@@ -68,3 +73,11 @@ class TestInterface(unittest.TestCase):
 
         with self.assertRaises(InterfaceException):
             ConcreteClassWithIncorrectAnnotation()
+
+    def test_interface_can_use_methods_after_checks(self):
+
+        self.assertEqual(ConcreteClassWithCorrectMethods().username(), 'Joe')
+
+    def test_interface_can_use_attribute_after_checks(self):
+
+        self.assertEqual(ConcreteClassWithCorrectMethods().test_attribute, 'Joe')
