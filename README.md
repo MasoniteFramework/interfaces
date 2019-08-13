@@ -19,6 +19,8 @@ $ pip install masonite-interfaces
 
 We can create an interface by creating a simple class that inherits from `masonite.interfaces.Interface`
 
+NOTE: The class must end with the word "Interface" like `AuthenticationInterface` or `SearchInterface`.
+
 ```python
 from masonite.interfaces import Interface
 
