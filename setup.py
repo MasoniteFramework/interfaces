@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import os
 
 setup(
     name="masonite-interfaces",
@@ -6,7 +7,7 @@ setup(
         'masonite.interfaces',
     ],
     package_dir={'': 'src'},
-    version='0.0.3',
+    version=os.getenv('CIRCLE_TAG', '0.0.3'),
     install_requires=[],
     description="Interface Package",
     author="Joseph Mancuso",
