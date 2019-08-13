@@ -1,6 +1,7 @@
 import inspect
 from .exceptions import InterfaceException
 
+
 class Interface:
 
     def __new__(cls, *args, **kwargs):
@@ -11,7 +12,7 @@ class Interface:
         for base_classes in cls.__bases__:
             if not base_classes.__name__.endswith('Interface'):
                 continue
-            
+
             for key, method in inspect.getmembers(base_classes):
                 if not key.startswith('__') and key != 'get_parameters':
                     members = []
@@ -54,12 +55,16 @@ class Interface:
                             cls, parameter_to_check_against[0], method, parameters[1].annotation, parameter_to_check_against[1].annotation))
 
                 variable_search_position += 1
-        instance = super().__new__(cls, *args, **kwargs)
+
+        try:
+            instance = super().__new__(cls, *args, **kwargs)
+        except TypeError:
+            instance = super().__new__(cls)
+
         return instance
+
     def get_parameters(obj):
         try:
             return inspect.signature(obj).parameters.items()
         except TypeError:
             return ()
-
-
