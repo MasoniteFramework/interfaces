@@ -9,7 +9,9 @@ class Interface:
 
         # Compile the Base classes
         for base_classes in cls.__bases__:
-
+            if not base_classes.__name__.endswith('Interface'):
+                continue
+            
             for key, method in inspect.getmembers(base_classes):
                 if not key.startswith('__') and key != 'get_parameters':
                     members = []
