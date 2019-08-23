@@ -1,13 +1,19 @@
 from setuptools import setup, find_packages
 import os
 
+with open('src/masonite/interfaces/version.txt', 'w') as file:
+    file.write(os.getenv('CIRCLE_TAG').replace('v', ''))
+
+with open('src/masonite/interfaces/version.txt') as file:
+    version = file.read()
+
 setup(
     name="masonite-interfaces",
     packages=[
         'masonite.interfaces',
     ],
     package_dir={'': 'src'},
-    version=os.getenv('CIRCLE_TAG', '0.0.3').replace('v', ''),
+    version=version,
     install_requires=[],
     description="Interface Package",
     author="Joseph Mancuso",
@@ -15,6 +21,7 @@ setup(
     url='https://github.com/MasoniteFramework/masonite',
     keywords=['masonite', 'python web framework', 'python3'],
     license='MIT',
+    include_package_data=True,
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
