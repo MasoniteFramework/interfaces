@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
 import os
 
-with open('src/masonite/interfaces/version.txt', 'w') as file:
-    file.write(os.getenv('CIRCLE_TAG', '0.0.7').replace('v', ''))
+if not os.path.exists('src/masonite/interfaces/version.txt', 'w'):
+    with open('src/masonite/interfaces/version.txt', 'w') as file:
+        file.write(os.getenv('CIRCLE_TAG', '0.0.7').replace('v', ''))
 
 with open('src/masonite/interfaces/version.txt') as file:
     version = file.read()
