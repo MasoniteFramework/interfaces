@@ -2,15 +2,13 @@ from setuptools import setup, find_packages
 import os
 import subprocess
 
-if not os.path.exists('src/masonite/interfaces/version.txt'):
-    default_version = bytes(
-        subprocess.check_output(['git', 'describe', '--tags', '--abbrev=0'])
-    ).decode('utf-8').replace('\n', '').replace('v', '')
+version_file = 'src/masonite/interfaces/version.txt'
 
-    with open('src/masonite/interfaces/version.txt', 'w') as file:
-        file.write(os.getenv('CIRCLE_TAG', default_version).replace('v', ''))
+if not os.path.exists(version_file):
+    with open(version_file, 'w') as file:
+        file.write(os.getenv('CIRCLE_TAG', '0.0.1-dev').replace('v', ''))
 
-with open('src/masonite/interfaces/version.txt') as file:
+with open(version_file) as file:
     version = file.read()
 
 setup(
