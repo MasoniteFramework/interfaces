@@ -1,9 +1,15 @@
 from setuptools import setup, find_packages
 import os
+from git import Repo
+import subprocess
 
 if not os.path.exists('src/masonite/interfaces/version.txt'):
+    default_version = bytes(
+        subprocess.check_output(['git', 'describe', '--tags', '--abbrev=0'])
+    ).decode('utf-8').replace('\n', '').replace('v', '')
+
     with open('src/masonite/interfaces/version.txt', 'w') as file:
-        file.write(os.getenv('CIRCLE_TAG', '0.0.7').replace('v', ''))
+        file.write(os.getenv('CIRCLE_TAG', default_version).replace('v', ''))
 
 with open('src/masonite/interfaces/version.txt') as file:
     version = file.read()
