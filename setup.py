@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 import os
-from git import Repo
 import subprocess
 
 if not os.path.exists('src/masonite/interfaces/version.txt'):
