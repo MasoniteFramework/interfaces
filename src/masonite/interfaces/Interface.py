@@ -12,7 +12,7 @@ class Interface:
                     instance = super().__new__(cls, *args, **kwargs)
                 except TypeError:
                     instance = super().__new__(cls)
-        except ModuleNotFoundError:
+        except ImportError:
             pass
 
         methods_to_check = {}
