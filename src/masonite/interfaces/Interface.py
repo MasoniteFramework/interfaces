@@ -9,9 +9,9 @@ class Interface:
             from config import application
             if not application.DEBUG:
                 try:
-                    instance = super().__new__(cls, *args, **kwargs)
+                    return super().__new__(cls, *args, **kwargs)
                 except TypeError:
-                    instance = super().__new__(cls)
+                    return super().__new__(cls)
         except ImportError:
             pass
 
