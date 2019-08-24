@@ -5,22 +5,41 @@ from .exceptions import InterfaceException
 class Interface:
 
     def __new__(cls, *args, **kwargs):
+        try:
+            from config import application
+            if not application.DEBUG:
+                try:
+                    instance = super().__new__(cls, *args, **kwargs)
+                except TypeError:
+                    instance = super().__new__(cls)
+        except ModuleNotFoundError:
+            pass
+
         methods_to_check = {}
         methods_to_check_against = {}
+        to_check = {}
+        inherited_methods = []
 
-        # Compile the Base classes
-        for base_classes in cls.__bases__:
-            if not base_classes.__name__.endswith('Interface'):
+        for base_class in cls.__bases__:
+            if not base_class.__name__.endswith('Interface'):
+                for key, method in inspect.getmembers(base_class):
+                    if not key.startswith('__') and key != 'get_parameters':
+                        members = []
+                        for param_key, param_value in cls.get_parameters(method):
+                            members += [(param_key, param_value)]
+                        inherited_methods += [key]
+                        # methods_to_check_against.update({key: members})
                 continue
 
-            for key, method in inspect.getmembers(base_classes):
+            # Get the methods to check from the interface
+            for key, method in inspect.getmembers(base_class):
                 if not key.startswith('__') and key != 'get_parameters':
                     members = []
                     for param_key, param_value in cls.get_parameters(method):
                         members += [(param_key, param_value)]
                     methods_to_check.update({key: members})
 
-        # Compile current cls
+        # Get the methods on the current class
         for key, method in inspect.getmembers(cls):
             if not key.startswith('__') and key != 'get_parameters':
                 members = []
@@ -28,10 +47,12 @@ class Interface:
                     members += [(param_key, param_value)]
                 methods_to_check_against.update({key: members})
 
+
+        cls.__to_check__ = methods_to_check_against  
         # Perform Checks
         for method, values in methods_to_check.items():
             # Check the existance
-            if method not in cls.__dict__:
+            if method not in cls.__dict__ and (method in cls.__to_check__ and method not in inherited_methods):
 
                 raise InterfaceException(
                     "{}'s {} method must exist".format(cls, method))
