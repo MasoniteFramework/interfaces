@@ -1,19 +1,40 @@
 import inspect
+import os
+
 from .exceptions import InterfaceException
+
+
+def _is_interfaces_enabled():
+    """
+    Check if the Interfaces check should be enabled.
+    - If env variable ENABLE_INTERFACES is False, return False.
+    - If env variable ENABLE_INTERFACES is True or undefined, check if Masonite is being used,
+      and return according to application.DEBUG. If not Masonite, return True.
+    :return: True/False
+    """
+    env_enabled = os.environ.get("ENABLE_INTERFACES", None)
+    enabled = env_enabled.lower() in ("true", "1", "yes") if env_enabled is not None else None
+    if enabled is False:
+        return False
+
+    try:
+        from config import application
+        if not application.DEBUG:  # Probably deployed in production
+            return False
+    except ImportError:
+        pass
+
+    return True
 
 
 class Interface:
 
     def __new__(cls, *args, **kwargs):
-        try:
-            from config import application
-            if not application.DEBUG:
-                try:
-                    return super().__new__(cls, *args, **kwargs)
-                except TypeError:
-                    return super().__new__(cls)
-        except ImportError:
-            pass
+        if not _is_interfaces_enabled():
+            try:
+                return super().__new__(cls, *args, **kwargs)
+            except TypeError:
+                return super().__new__(cls)
 
         methods_to_check = {}
         methods_to_check_against = {}

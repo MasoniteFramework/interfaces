@@ -1,4 +1,8 @@
 import unittest
+from unittest.mock import patch, Mock
+
+import sys
+
 from src.masonite.interfaces import Interface
 from src.masonite.interfaces.exceptions import InterfaceException
 
@@ -81,3 +85,38 @@ class TestInterface(unittest.TestCase):
     def test_interface_can_use_attribute_after_checks(self):
 
         self.assertEqual(ConcreteClassWithCorrectMethods().test_attribute, 'Joe')
+
+    def test_interface_with_checks_disabled(self):
+        """
+        Test that interface checks are not done when interfaces is disabled.
+        No exceptions should occur.
+        """
+        env = patch.dict('os.environ', {'ENABLE_INTERFACES': 'FALSE'})
+        with env:
+            ConcreteClassWithIncorrectAnnotation()
+            ConcreteClassWithCorrectAnnotation()
+
+    def test_interface_with_checks_enabled(self):
+        """Test that interface checks are done when interfaces is enabled."""
+        env = patch.dict('os.environ', {'ENABLE_INTERFACES': 'TRUE'})
+        with env:
+            with self.assertRaises(InterfaceException):
+                ConcreteClassWithIncorrectAnnotation()
+            ConcreteClassWithCorrectAnnotation()
+
+    def test_interface_with_masonite_debug_on(self):
+        """Test that interface checks are done when Masonite DEBUG is on."""
+        mock_config = Mock()
+        mock_config.application = Mock()
+        mock_config.application.DEBUG = True
+        sys.modules["config"] = mock_config
+        with self.assertRaises(InterfaceException):
+            ConcreteClassWithIncorrectAnnotation()
+
+    def test_interface_with_masonite_debug_off(self):
+        """Test that interface checks are not done when Masonite DEBUG is off."""
+        mock_config = Mock()
+        mock_config.application = Mock()
+        mock_config.application.DEBUG = False
+        sys.modules["config"] = mock_config
+        ConcreteClassWithIncorrectAnnotation()
