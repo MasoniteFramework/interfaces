@@ -37,18 +37,22 @@ class Interface:
 
         methods_to_check = {}
         methods_to_check_against = {}
-        to_check = {}
         inherited_methods = []
 
         for base_class in cls.__bases__:
             if not base_class.__name__.endswith('Interface'):
-                for key, method in inspect.getmembers(base_class):
-                    if not key.startswith('__') and not method.__name__.startswith('__') and key != 'get_parameters':
-                        members = []
-                        for param_key, param_value in cls.get_parameters(method):
-                            members += [(param_key, param_value)]
-                        inherited_methods += [key]
-                        # methods_to_check_against.update({key: members})
+                inherited_methods += [
+                    key for key, method in inspect.getmembers(base_class)
+                    if not key.startswith('__') and not method.__name__.startswith('__')
+                    and key != 'get_parameters'
+                ]
+                # for key, method in inspect.getmembers(base_class):
+                #     if not key.startswith('__') and not method.__name__.startswith('__') and key != 'get_parameters':
+                #         members = []
+                #         for param_key, param_value in cls.get_parameters(method):
+                #             members += [(param_key, param_value)]
+                #         inherited_methods += [key]
+                #         # methods_to_check_against.update({key: members})
                 continue
 
             # Get the methods to check from the interface
