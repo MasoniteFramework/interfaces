@@ -4,33 +4,32 @@ import os
 from .exceptions import InterfaceException
 
 
-def _is_interfaces_enabled():
-    """
-    Check if the Interfaces check should be enabled.
-    - If env variable ENABLE_INTERFACES is False, return False.
-    - If env variable ENABLE_INTERFACES is True or undefined, check if Masonite is being used,
-      and return according to application.DEBUG. If not Masonite, return True.
-    :return: True/False
-    """
-    env_enabled = os.environ.get("ENABLE_INTERFACES", None)
-    enabled = env_enabled.lower() in ("true", "1", "yes") if env_enabled is not None else None
-    if enabled is False:
-        return False
-
-    try:
-        from config import application
-        if not application.DEBUG:  # Probably deployed in production
-            return False
-    except ImportError:
-        pass
-
-    return True
-
-
 class Interface:
 
+    def __is_interfaces_enabled():
+        """
+        Check if the Interfaces check should be enabled.
+        - If env variable ENABLE_INTERFACES is False, return False.
+        - If env variable ENABLE_INTERFACES is True or undefined, check if Masonite is being used,
+          and return according to application.DEBUG. If not Masonite, return True.
+        :return: True/False
+        """
+        env_enabled = os.environ.get("ENABLE_INTERFACES", None)
+        enabled = env_enabled.lower() in ("true", "1", "yes") if env_enabled is not None else None
+        if enabled is False:
+            return False
+
+        try:
+            from config import application
+            if not application.DEBUG:  # Probably deployed in production
+                return False
+        except ImportError:
+            pass
+
+        return True
+
     def __new__(cls, *args, **kwargs):
-        if not _is_interfaces_enabled():
+        if not cls.__is_interfaces_enabled():
             try:
                 return super().__new__(cls, *args, **kwargs)
             except TypeError:
@@ -44,7 +43,7 @@ class Interface:
         for base_class in cls.__bases__:
             if not base_class.__name__.endswith('Interface'):
                 for key, method in inspect.getmembers(base_class):
-                    if not key.startswith('__') and key != 'get_parameters':
+                    if not key.startswith('__') and not method.__name__.startswith('__') and key != 'get_parameters':
                         members = []
                         for param_key, param_value in cls.get_parameters(method):
                             members += [(param_key, param_value)]
@@ -54,7 +53,7 @@ class Interface:
 
             # Get the methods to check from the interface
             for key, method in inspect.getmembers(base_class):
-                if not key.startswith('__') and key != 'get_parameters':
+                if not key.startswith('__') and not method.__name__.startswith('__') and key != 'get_parameters':
                     members = []
                     for param_key, param_value in cls.get_parameters(method):
                         members += [(param_key, param_value)]
