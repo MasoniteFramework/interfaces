@@ -6,6 +6,7 @@ from .exceptions import InterfaceException
 
 class Interface:
 
+    @staticmethod
     def __is_interfaces_enabled():
         """
         Check if the Interfaces check should be enabled.
@@ -50,7 +51,7 @@ class Interface:
 
             # Get the methods to check from the interface
             for key, method in inspect.getmembers(base_class):
-                if (key.startswith('__') or method.__name__.startswith('__') or key == 'get_parameters'):
+                if key.startswith('__') or method.__name__.startswith('__') or key == 'get_parameters':
                     continue
                 methods_to_check.update({key: [
                     (param_key, param_value)
@@ -65,11 +66,10 @@ class Interface:
                 (param_key, param_value) for param_key, param_value in cls.get_parameters(method)
             ]})
 
-
         cls.__to_check__ = methods_to_check_against  
         # Perform Checks
         for method, values in methods_to_check.items():
-            # Check the existance
+            # Check the existence
             if method not in cls.__dict__ and (method in cls.__to_check__ and method not in inherited_methods):
 
                 raise InterfaceException(
