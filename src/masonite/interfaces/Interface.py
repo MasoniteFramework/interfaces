@@ -1,57 +1,75 @@
 import inspect
+import os
+
 from .exceptions import InterfaceException
 
 
 class Interface:
 
-    def __new__(cls, *args, **kwargs):
+    @staticmethod
+    def __is_interfaces_enabled():
+        """
+        Check if the Interfaces check should be enabled.
+        - If env variable ENABLE_INTERFACES is False, return False.
+        - If env variable ENABLE_INTERFACES is True or undefined, check if Masonite is being used,
+          and return according to application.DEBUG. If not Masonite, return True.
+        :return: True/False
+        """
+        env_enabled = os.environ.get("ENABLE_INTERFACES", None)
+        enabled = env_enabled.lower() in ("true", "1", "yes") if env_enabled is not None else None
+        if enabled is False:
+            return False
+
         try:
             from config import application
-            if not application.DEBUG:
-                try:
-                    return super().__new__(cls, *args, **kwargs)
-                except TypeError:
-                    return super().__new__(cls)
+            if not application.DEBUG:  # Probably deployed in production
+                return False
         except ImportError:
             pass
 
+        return True
+
+    def __new__(cls, *args, **kwargs):
+        if not cls.__is_interfaces_enabled():
+            try:
+                return super().__new__(cls, *args, **kwargs)
+            except TypeError:
+                return super().__new__(cls)
+
         methods_to_check = {}
         methods_to_check_against = {}
-        to_check = {}
         inherited_methods = []
 
         for base_class in cls.__bases__:
             if not base_class.__name__.endswith('Interface'):
-                for key, method in inspect.getmembers(base_class):
-                    if not key.startswith('__') and key != 'get_parameters':
-                        members = []
-                        for param_key, param_value in cls.get_parameters(method):
-                            members += [(param_key, param_value)]
-                        inherited_methods += [key]
-                        # methods_to_check_against.update({key: members})
+                inherited_methods += [
+                    key for key, method in inspect.getmembers(base_class)
+                    if not key.startswith('__') and not method.__name__.startswith('__')
+                    and key != 'get_parameters'
+                ]
                 continue
 
             # Get the methods to check from the interface
             for key, method in inspect.getmembers(base_class):
-                if not key.startswith('__') and key != 'get_parameters':
-                    members = []
-                    for param_key, param_value in cls.get_parameters(method):
-                        members += [(param_key, param_value)]
-                    methods_to_check.update({key: members})
+                if key.startswith('__') or method.__name__.startswith('__') or key == 'get_parameters':
+                    continue
+                methods_to_check.update({key: [
+                    (param_key, param_value)
+                    for param_key, param_value in cls.get_parameters(method)
+                ]})
 
         # Get the methods on the current class
         for key, method in inspect.getmembers(cls):
-            if not key.startswith('__') and key != 'get_parameters':
-                members = []
-                for param_key, param_value in cls.get_parameters(method):
-                    members += [(param_key, param_value)]
-                methods_to_check_against.update({key: members})
-
+            if key.startswith('__') or key == 'get_parameters':
+                continue
+            methods_to_check_against.update({key: [
+                (param_key, param_value) for param_key, param_value in cls.get_parameters(method)
+            ]})
 
         cls.__to_check__ = methods_to_check_against  
         # Perform Checks
         for method, values in methods_to_check.items():
-            # Check the existance
+            # Check the existence
             if method not in cls.__dict__ and (method in cls.__to_check__ and method not in inherited_methods):
 
                 raise InterfaceException(
